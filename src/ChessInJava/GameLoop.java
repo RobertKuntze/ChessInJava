@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameLoop {
-    private static final String List = null;
-
     public static void main(String[] args) {
         Board board = new Board();
         boolean white = true;
