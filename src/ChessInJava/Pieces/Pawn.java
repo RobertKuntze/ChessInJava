@@ -12,7 +12,7 @@ public class Pawn extends Piece {
     }
 
     public String toString() {
-        return "P";
+        return "P ";
     }
 
     
@@ -20,20 +20,26 @@ public class Pawn extends Piece {
         int range = 1;
         List<Position> results = new ArrayList<Position>();
 
-        if ((position.rank() == 1 && white) || (position.rank() == 6 && !white)) {
+        if ((position.getrank() == 1 && white) || (position.getrank() == 6 && !white)) {
             range = 2;
         }
 
         if (!white) {
             for (int i=1; i<=range; i++) {
-                results.add(new Position(position.file(), position.rank() - i));
+                results.add(new Position(position.getfile(), position.getrank() - i));
             }
+            results.add(new Position(position.getfile() + 1, position.getrank() - 1));
+            results.add(new Position(position.getfile() - 1, position.getrank() - 1));
+
         }
 
         if (white) {
             for (int i=1; i<=range; i++) {
-                results.add(new Position(position.file(), position.rank() + i));
+                results.add(new Position(position.getfile(), position.getrank() + i));
             }
+            results.add(new Position(position.getfile() + 1, position.getrank() + 1));
+            results.add(new Position(position.getfile() - 1, position.getrank() + 1));
+
         }
 
         return results;
