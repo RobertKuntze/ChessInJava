@@ -32,6 +32,9 @@ public class Position implements Comparable<Position>{
 
     @Override
     public String toString() {
+        if (this.file < 0 || this.file > 7 ) {
+            return "(" + this.file + ", " + this.rank + ")";
+        }
         String[] files = {"a", "b", "c", "d", "e", "f", "g", "h"};
         return files[file] + (rank + 1);
     }

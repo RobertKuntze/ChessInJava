@@ -18,7 +18,7 @@ public class Pawn extends Piece {
     
     public List<Position> move(Position position) {
         int range = 1;
-        List<Position> results = new ArrayList<Position>();
+        List<Position> result = new ArrayList<Position>();
 
         if ((position.getrank() == 1 && white) || (position.getrank() == 6 && !white)) {
             range = 2;
@@ -26,23 +26,29 @@ public class Pawn extends Piece {
 
         if (!white) {
             for (int i=1; i<=range; i++) {
-                results.add(new Position(position.getfile(), position.getrank() - i));
+                result.add(new Position(position.getfile(), position.getrank() - i));
             }
-            results.add(new Position(position.getfile() + 1, position.getrank() - 1));
-            results.add(new Position(position.getfile() - 1, position.getrank() - 1));
+            result.add(new Position(position.getfile() + 1, position.getrank() - 1));
+            result.add(new Position(position.getfile() - 1, position.getrank() - 1));
 
         }
 
         if (white) {
             for (int i=1; i<=range; i++) {
-                results.add(new Position(position.getfile(), position.getrank() + i));
+                result.add(new Position(position.getfile(), position.getrank() + i));
             }
-            results.add(new Position(position.getfile() + 1, position.getrank() + 1));
-            results.add(new Position(position.getfile() - 1, position.getrank() + 1));
+            result.add(new Position(position.getfile() + 1, position.getrank() + 1));
+            result.add(new Position(position.getfile() - 1, position.getrank() + 1));
 
         }
 
-        return results;
+        for(Position position2 : new ArrayList<Position>(result)) {
+            if (position2.getfile() < 0 || position2.getfile() > 7 || position2.getrank() < 0 || position2.getrank() > 7) {
+                result.remove(position2);
+            }
+        }
+
+        return result;
     }
     
 }

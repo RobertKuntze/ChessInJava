@@ -39,6 +39,14 @@ public class Board {
         }
     }
 
+    public Board(Board board) {
+        for (int i=0; i<8; i++) {
+            for (int j=0; j<8; j++) {
+                this.board[i][j] = board.board[i][j];
+            }
+        }
+    }
+
     public void addPiece(Piece piece, Position position) {
         this.board[position.getfile()][position.getrank()] = piece;
     }
@@ -54,7 +62,7 @@ public class Board {
     public Position getPosition(Piece piece) {
         for (int i=0; i<8; i++) {
             for (int j=0; j<8; j++) {
-                if (this.board[i][j] == piece) {
+                if (piece.equals(this.board[i][j])) {
                     return new Position(i, j);
                 }
             }
@@ -62,13 +70,13 @@ public class Board {
         return null;
     }
 
-    public List<Piece> getAllPieces(boolean white) {
-        List<Piece> result = new ArrayList<Piece>();
+    public Map<Position, Piece> getAllPieces(boolean white) {
+        Map<Position, Piece> result = new HashMap<Position, Piece>();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (board[i][j] != null) {
                     if (board[i][j].isWhite() == white) {
-                        result.add(board[i][j]);
+                        result.put(new Position(i, j), board[i][j]);
                     }
                 }
             }
@@ -81,9 +89,7 @@ public class Board {
             if(getPiece(start).isWhite() == getPiece(end).isWhite()) {
                 throw new IllegalArgumentException("You can't move your piece to a position with your own piece");
             }
-        } if (getPiece(start).getClass() == Pawn.class && ((end.getfile() != start.getfile() && this.getPiece(end) == null) || (end.getfile() == start.getfile() && this.getPiece(end) != null))){
-            throw new IllegalArgumentException("Pawns can only take diagonally");
-        } if (!getPiece(start).move(start).contains(end)) {
+        } if (!this.getLegalMoves(this.getPiece(start).move(start), start).contains(end)) {
             throw new IllegalArgumentException("Invalid move");
         }
 
@@ -91,11 +97,72 @@ public class Board {
         this.removePiece(start);
     }
 
+    public List<Position> getLegalMoves(List<Position> positions, Position start) {
+        Piece piece = this.getPiece(start);
+                
+        if (piece instanceof Knight) {
+            return positions;
+        }
+        Map<Position, List<Position>> relativePositions = new HashMap<Position, List<Position>>();
+        int[] directions = {-1, 0, 1};
+        for (int i : directions) {
+            for (int j : directions) {
+                if (i == 0 && j == 0) {
+                    continue;
+                }
+                relativePositions.put(new Position(i, j), new ArrayList<Position>());
+            }
+        }
+        for (Position direction : relativePositions.keySet()) {
+            for (Position position : positions) {
+                if (Integer.signum(position.getfile() - start.getfile()) == direction.getfile() 
+                && Integer.signum(position.getrank() - start.getrank()) == direction.getrank()) {
+                    relativePositions.get(direction).add(position);
+                }
+            }
+        }
+
+        List<Position> result = new ArrayList<Position>();
+        for (Position direction : relativePositions.keySet()) {
+            for (Position position : relativePositions.get(direction)) {
+                if (this.getPiece(position) == null) {
+                    result.add(position);
+                } else if (this.getPiece(position).isWhite() != piece.isWhite()) {
+                    result.add(position);
+                    break;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        if (piece instanceof Pawn) {
+            for (Position position : new ArrayList<Position>(result)) {
+                if ((position.getfile() != start.getfile() && this.getPiece(position) == null)
+                || (position.getfile() == start.getfile() && this.getPiece(position) != null)) {
+                    result.remove(position);
+                }
+            }
+        }
+
+        // for (Position position : result) {
+        //     Board board = new Board(this);
+        //     board.removePiece(start);
+        //     board.addPiece(piece, position);
+        //     if(board.isCheck(piece.isWhite())) {
+        //         result.remove(position);
+        //     }
+        // }
+
+        return result;
+    }
+
     public boolean isCheck(boolean white) {
         Position kingPosition = this.getPosition(new King(white));
-        List<Piece> allPieces = this.getAllPieces(!white);
-        for (Piece piece : allPieces) {
-            if (piece.move(this.getPosition(piece)).contains(kingPosition)) {
+        Map<Position, Piece> allPieces = this.getAllPieces(!white);
+        for (Position position : allPieces.keySet()) {
+            if (this.getLegalMoves(allPieces.get(position).move(position), position).contains(kingPosition)) {
+                System.out.println("Check by: " + allPieces.get(position) + " on " + position);
                 return true;
             }
         }
@@ -104,7 +171,7 @@ public class Board {
 
     public String toString() {
         String result = "";
-        for (int i=0; i<8; i++) {
+        for (int i=7; i >= 0; i--) {
             for (int j=0; j<8; j++) {
                 if (this.board[j][i] == null) {
                     result += "O ";
