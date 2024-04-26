@@ -3,4 +3,3 @@
 Missing Features:
 - castling
 - en passant
-- normal movement when checked
