@@ -93,15 +93,21 @@ public class Board {
             throw new IllegalArgumentException("Invalid move");
         }
 
+        if (this.getPiece(start) instanceof Pawn && (end.getrank() == 0 || end.getrank() == 7)) {
+            this.addPiece(new Queen(this.getPiece(start).isWhite()), end);
+            this.removePiece(start);
+            return;
+        }
+
         this.addPiece(getPiece(start), end);
         this.removePiece(start);
     }
 
-    public List<Position> getLegalMoves(List<Position> positions, Position start) {
+    public List<Position> getLegalMoves(List<Position> moves, Position start) {
         Piece piece = this.getPiece(start);
                 
         if (piece instanceof Knight) {
-            return positions;
+            return moves;
         }
         Map<Position, List<Position>> relativePositions = new HashMap<Position, List<Position>>();
         int[] directions = {-1, 0, 1};
@@ -114,7 +120,7 @@ public class Board {
             }
         }
         for (Position direction : relativePositions.keySet()) {
-            for (Position position : positions) {
+            for (Position position : moves) {
                 if (Integer.signum(position.getfile() - start.getfile()) == direction.getfile() 
                 && Integer.signum(position.getrank() - start.getrank()) == direction.getrank()) {
                     relativePositions.get(direction).add(position);

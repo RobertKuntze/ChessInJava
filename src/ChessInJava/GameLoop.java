@@ -1,8 +1,5 @@
 package ChessInJava;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class GameLoop {
     public static void main(String[] args) {
         Board board = new Board();
@@ -12,6 +9,7 @@ public class GameLoop {
         while (true) {
             System.out.println(board);
             System.out.println(white ? "White's move" : "Black's move");
+            System.out.print(board.isCheck(white) ? "You are in Check!\n" : "");
             String[] positions = userInteractionManager.getUserInput();
             Position start = new Position(positions[0]);
             Position end = new Position(positions[1]);
